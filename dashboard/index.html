@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by implied value</title>
+<link rel="stylesheet" href="app.css">
+<script src="../data.js"></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<header class="page-head">
+  <h1>Token Radar</h1>
+  <p class="tagline">Protocols without a token yet, ranked by what a token would be worth if it launched today.</p>
+  <p class="meta" id="meta"></p>
+</header>
+
+<nav class="tabs" aria-label="Views">
+  <button type="button" id="tab-board" data-tab="board">Board</button>
+  <button type="button" id="tab-live" data-tab="live">Live tokens</button>
+</nav>
+
+<section class="controls" aria-label="Filters">
+  <input id="search" type="search" placeholder="Search name or slug" autocomplete="off">
+  <select id="category" aria-label="Category">
+    <option value="">All categories</option>
+  </select>
+  <select id="chain" aria-label="Chain">
+    <option value="">All chains</option>
+  </select>
+  <label class="watch-toggle"><input id="watchlist" type="checkbox"> Watchlist only</label>
+</section>
+
+<p class="count" id="count"></p>
+
+<table id="board-table">
+  <thead>
+    <tr>
+      <th data-sort="rank">Rank</th>
+      <th data-sort="name">Protocol</th>
+      <th data-sort="category">Category</th>
+      <th>Chains</th>
+      <th data-sort="tvl" class="num">TVL</th>
+      <th data-sort="change" class="num">7d</th>
+      <th data-sort="implied" class="num" id="value-head">Implied value</th>
+    </tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<dialog class="detail" id="detail"></dialog>
+
+<footer class="page-foot">
+  <p>Implied value is TVL times a category multiple, a growth multiple from the 7-day change, a maturity multiple from the protocol's age, and a chain multiple from how many chains it runs on. The watchlist is a floor, never a ceiling: the board ranks every protocol on it plus every other pre-token protocol that qualifies.</p>
+</footer>
+</body>
+</html>
