@@ -140,3 +140,59 @@ dialog.detail::backdrop { background: rgba(16, 24, 40, 0.45); }
 .recompute { background: var(--soft); border-radius: 8px; padding: 10px 12px; }
 
 .page-foot { margin-top: 26px; color: var(--muted); font-size: 13px; }
+
+/* ---- summary strip: four headline numbers, computed at load ---------- */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 4px 0 16px;
+}
+.stat {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.stat-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+.stat-value { font-size: 17px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---- the board table scrolls inside its wrapper on narrow screens ---- */
+.table-wrap { overflow-x: auto; border-radius: 10px; }
+.table-wrap table { border-radius: 0; }
+
+/* ---- top-10 bar chart: pure CSS bars --------------------------------- */
+.top10, .how, .calibration { margin-top: 30px; }
+.top10 h2, .how h2, .calibration h2 { margin: 0 0 4px; font-size: 19px; letter-spacing: -0.01em; }
+.top10 p, .how p, .calibration p { margin: 6px 0 12px; color: var(--muted); font-size: 14px; }
+.bars { display: flex; flex-direction: column; gap: 7px; }
+.bar-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.bar-rank { width: 30px; flex: none; color: var(--muted); font-size: 13px; text-align: right; }
+.bar-name { width: 190px; flex: none; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { flex: 1; min-width: 0; height: 14px; background: var(--soft); border-radius: 999px; overflow: hidden; }
+.bar-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.bar-value { width: 86px; flex: none; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---- model + calibration tables --------------------------------------- */
+.mults, .calib { font-size: 14px; }
+.mults td, .calib td { padding: 7px 12px; }
+.calib th, .calib td { white-space: nowrap; }
+.calib td:first-child { white-space: normal; }
+
+/* ---- one mobile breakpoint: everything must fit a 390px viewport ----- */
+@media (max-width: 640px) {
+  body { padding: 18px 12px 36px; font-size: 14px; }
+  .page-head h1 { font-size: 26px; }
+  .summary { grid-template-columns: repeat(2, 1fr); }
+  .stat-value { font-size: 15px; }
+  .controls input[type="search"] { min-width: 0; flex: 1 1 100%; }
+  .bar-name { width: 110px; }
+  .bar-value { width: 70px; }
+  table { font-size: 13px; }
+  tbody td { padding: 7px 8px; }
+  .detail-inner { padding: 18px 16px 22px; }
+}

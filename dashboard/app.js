@@ -120,6 +120,36 @@
       [['Insurance'], function (n, c, a) {
         return 'Buy $' + a + ' of cover from ' + n + ' on ' + c + ' and keep the policy.';
       }],
+      [['Anchor BTC', 'Decentralized BTC'], function (n, c, a) {
+        return 'Deposit $' + a + ' of BTC into ' + n + ' on ' + c + ' and keep the receipt.';
+      }],
+      [['Basis Trading'], function (n, c, a) {
+        return 'Deposit $' + a + ' of USDC as margin on ' + n + ' and open one small basis trade.';
+      }],
+      [['CeDeFi'], function (n, c, a) {
+        return 'Deposit $' + a + " of USDC into " + n + "'s vault on " + c + ' and keep the position open.';
+      }],
+      [['Chain'], function (n, c, a) {
+        return 'Move $' + a + ' of USDC onto ' + c + ' through ' + n + " and use it in the chain's main app.";
+      }],
+      [['Crypto Card Issuer'], function (n, c, a) {
+        return 'Order a ' + n + ' card and load $' + a + ' on ' + c + ', then use it for everyday spending.';
+      }],
+      [['Farm'], function (n, c, a) {
+        return 'Deposit $' + a + " of USDC into " + n + "'s farm on " + c + ' and keep the position open.';
+      }],
+      [['Governance Incentives'], function (n, c, a) {
+        return 'Deposit $' + a + ' into ' + n + ' on ' + c + ' and take part in its governance votes.';
+      }],
+      [['Liquidity Manager'], function (n, c, a) {
+        return 'Deposit $' + a + ' into a ' + n + ' managed vault on ' + c + ' and keep the shares.';
+      }],
+      [['OTC Marketplace'], function (n, c, a) {
+        return 'Fund $' + a + ' and place one OTC trade on ' + n + ' on ' + c + '.';
+      }],
+      [['Payments'], function (n, c, a) {
+        return 'Open a $' + a + ' payment channel on ' + c + ' through ' + n + ' and keep it funded.';
+      }],
     ],
     function (n, c, a) {
       return 'Deposit $' + a + ' of USDC into ' + n + ' on ' + c + ' and keep the position open.';
@@ -155,6 +185,36 @@
       [['Insurance'], function (n) {
         return 'Check the cover terms on ' + n + ' and renew or adjust a small amount each week.';
       }],
+      [['Anchor BTC'], function (n) {
+        return 'Check the BTC yield accrual on ' + n + ' and add or restake a small amount each week.';
+      }],
+      [['CeDeFi'], function (n) {
+        return 'Check the yield on ' + n + ' and add or withdraw a small amount each week.';
+      }],
+      [['Chain'], function (n, c) {
+        return "Use " + n + "'s main app on " + c + ' once a week so the activity is recorded.';
+      }],
+      [['Cross Chain Bridge'], function (n) {
+        return 'Bridge a small amount through ' + n + ' to another chain each week.';
+      }],
+      [['Crypto Card Issuer'], function (n) {
+        return 'Spend a small amount with the ' + n + ' card each week and top it up.';
+      }],
+      [['Decentralized BTC'], function (n) {
+        return 'Check the BTC yield on ' + n + ' and add or restake a small amount each week.';
+      }],
+      [['Farm'], function (n) {
+        return 'Harvest and restake the farm rewards on ' + n + ' once a week.';
+      }],
+      [['Governance Incentives'], function (n) {
+        return 'Vote with the ' + n + ' position once a week and claim any incentives.';
+      }],
+      [['OTC Marketplace'], function (n) {
+        return 'Place one small OTC trade on ' + n + ' each week.';
+      }],
+      [['Payments'], function (n) {
+        return 'Route one small payment through the ' + n + ' channel each week.';
+      }],
     ],
     function (n) {
       return 'Make one qualifying action on ' + n + ' each week, such as a deposit, a borrow, a swap or a vote.';
@@ -184,6 +244,30 @@
       [['RWA'], function (n) {
         return "Before you withdraw, open " + n + "'s yield dashboard and claim only from the link it publishes.";
       }],
+      [['Anchor BTC', 'Decentralized BTC'], function (n) {
+        return "Before you withdraw, open " + n + "'s BTC rewards page and claim only from the link it publishes.";
+      }],
+      [['CeDeFi', 'Chain', 'Insurance', 'Payments'], function (n) {
+        return "Before you withdraw, open " + n + "'s rewards page and claim only from the link it publishes.";
+      }],
+      [['Cross Chain Bridge'], function (n) {
+        return "Before you withdraw, open " + n + "'s bridge rewards page and claim only from the link it publishes.";
+      }],
+      [['Crypto Card Issuer'], function (n) {
+        return "Before you withdraw, open " + n + "'s card rewards page and claim only from the link it publishes.";
+      }],
+      [['Dual-Token Stablecoin', 'Stablecoin Wrapper'], function (n) {
+        return "Before you withdraw, open " + n + "'s stable rewards page and claim only from the link it publishes.";
+      }],
+      [['Farm'], function (n) {
+        return "Before you withdraw, open " + n + "'s farm rewards page and claim only from the link it publishes.";
+      }],
+      [['Governance Incentives'], function (n) {
+        return "Before you withdraw, open " + n + "'s incentives page and claim only from the link it publishes.";
+      }],
+      [['OTC Marketplace'], function (n) {
+        return "Before you withdraw, open " + n + "'s trading rewards page and claim only from the link it publishes.";
+      }],
     ],
     function () {
       return "Before you withdraw, open the protocol's own points or rewards page and claim only from the link it publishes.";
@@ -210,6 +294,85 @@
       'Write the wallet, the dates and every transaction in a farm log so you can repeat the position or unwind it. ' +
         'Cost: nothing but the log. Time: 5 minutes.',
     ];
+  }
+
+  // ---- board sections: summary, top-10 chart, model, calibration --------
+  //
+  // All four are computed from the data file at load, never hard-coded, so
+  // they stay right whatever snapshot the entry is run on.
+
+  function renderSummary() {
+    var el = document.getElementById('summary');
+    if (!el) return;
+    var rows = DATA.rows;
+    var total = rows.reduce(function (s, r) { return s + r.implied_value_usd; }, 0);
+    var top10 = rows.slice(0, 10).reduce(function (s, r) { return s + r.implied_value_usd; }, 0);
+    var chains = new Set();
+    rows.forEach(function (r) { r.chains.forEach(function (c) { chains.add(c); }); });
+    var byCat = {};
+    rows.forEach(function (r) {
+      byCat[r.category] = byCat[r.category] || { n: 0, sum: 0 };
+      byCat[r.category].n += 1;
+      byCat[r.category].sum += r.implied_value_usd;
+    });
+    var biggest = Object.keys(byCat).sort(function (a, b) { return byCat[b].sum - byCat[a].sum; })[0];
+    el.innerHTML =
+      '<div class="stat"><span class="stat-label">Total implied value</span><span class="stat-value">' + compact(total) + '</span></div>' +
+      '<div class="stat"><span class="stat-label">Top 10 protocols</span><span class="stat-value">' + compact(top10) + ' · ' + Math.round((top10 / total) * 100) + '%</span></div>' +
+      '<div class="stat"><span class="stat-label">Chains covered</span><span class="stat-value">' + chains.size + '</span></div>' +
+      '<div class="stat"><span class="stat-label">Largest category</span><span class="stat-value">' + esc(biggest) + ' · ' + byCat[biggest].n + ' · ' + compact(byCat[biggest].sum) + '</span></div>';
+  }
+
+  function renderTop10() {
+    var el = document.getElementById('top10');
+    if (!el) return;
+    var top = DATA.rows.slice(0, 10);
+    var max = top.length ? top[0].implied_value_usd : 1;
+    var html = '<h2>Top 10 by implied value</h2><div class="bars">' + top.map(function (r) {
+      var pct = (r.implied_value_usd / max) * 100;
+      return '<div class="bar-row"><span class="bar-rank">#' + r.rank + '</span>' +
+        '<span class="bar-name">' + esc(r.name) + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + pct.toFixed(1) + '%"></span></span>' +
+        '<span class="bar-value">' + compact(r.implied_value_usd) + '</span></div>';
+    }).join('') + '</div>';
+    el.innerHTML = html;
+  }
+
+  function renderHow() {
+    var el = document.getElementById('how');
+    if (!el || !DATA.model) return;
+    var m = DATA.model;
+    var mults = Object.keys(m.category_multiples)
+      .filter(function (k) { return k !== 'default'; })
+      .sort(function (a, b) { return m.category_multiples[b] - m.category_multiples[a] || (a < b ? -1 : 1); });
+    var html = '<h2>How the model works</h2>' +
+      '<p>Implied value = TVL × category multiple × growth multiple × maturity multiple × chain multiple. ' +
+      'The growth multiple is 1 + (7-day change, clamped to ' + m.growth_floor + '% … +' + m.growth_cap + '%) × ' + m.growth_weight + '. ' +
+      'The maturity multiple runs from ' + m.maturity_floor + ' up to 1 over ' + m.maturity_days + ' days (an unknown listing date counts as ' + m.unknown_age_days + ' days). ' +
+      'The chain multiple adds ' + m.chain_step + ' per extra chain, capped at +' + (m.chain_step * m.chain_cap) + '. ' +
+      'The base multiple of ' + m.base_multiple + ' is recorded but not used in the product.</p>' +
+      '<div class="table-wrap"><table class="mults"><thead><tr><th>Category</th><th class="num">Multiple</th></tr></thead><tbody>' +
+      mults.map(function (k) {
+        return '<tr><td>' + esc(k) + '</td><td class="num">× ' + m.category_multiples[k] + '</td></tr>';
+      }).join('') +
+      '<tr><td>Anything else (default)</td><td class="num">× ' + m.category_multiples['default'] + '</td></tr>' +
+      '</tbody></table></div>';
+    el.innerHTML = html;
+  }
+
+  function renderCalibration() {
+    var el = document.getElementById('calibration');
+    if (!el || !Array.isArray(DATA.calibration) || !DATA.calibration.length) return;
+    var html = '<h2>Calibration against live tokens</h2>' +
+      '<p>For each category on the board that already has launched tokens: what those live tokens trade at per dollar of TVL (median), next to the multiple the model credits the category. ' +
+      'Where the live median sits far above the multiple the board is conservative; where it sits below, the board is optimistic. ' +
+      'Categories with one live token are noisy — read the count before the number. This table never changes the ranking.</p>' +
+      '<div class="table-wrap"><table class="calib"><thead><tr><th>Category</th><th class="num">Live tokens</th><th class="num">Median live mcap</th><th class="num">Median live mcap / TVL</th><th class="num">Model multiple</th></tr></thead><tbody>' +
+      DATA.calibration.map(function (c) {
+        return '<tr><td>' + esc(c.category) + '</td><td class="num">' + c.live_n + '</td><td class="num">' + compact(c.median_mcap_usd) + '</td><td class="num">' + c.median_mcap_tvl + '</td><td class="num">× ' + c.model_multiple + '</td></tr>';
+      }).join('') +
+      '</tbody></table></div>';
+    el.innerHTML = html;
   }
 
   // ---- recompute: replay the model's arithmetic from the row itself ------
@@ -401,7 +564,8 @@
       (matches
         ? ' — the same number board.json carries.'
         : ' (board.json carries ' + money(row.implied_value_usd) + ').') +
-      ' The base multiple of ' + m.base_multiple + ' is recorded in the model but not used in the product.</p>' +
+      ' The base multiple of ' + m.base_multiple + ' is recorded in the model but not used in the product. ' +
+      'Multipliers are shown rounded to six decimals; the recompute uses the unrounded inputs.</p>' +
       (prev || next
         ? '<p>Neighbours on the board: ' +
           (prev ? '#' + prev.rank + ' ' + esc(prev.name) + ' at ' + compact(prev.implied_value_usd) : '') +
@@ -515,6 +679,10 @@
     'Snapshot ' + DATA.as_of + ' · ' + DATA.board_size + ' protocols on the board · ' +
     DATA.live_size + ' live tokens · model ' + DATA.model_version;
   fillSelects();
+  renderSummary();
+  renderTop10();
+  renderHow();
+  renderCalibration();
   readHash();
   render();
 })();
