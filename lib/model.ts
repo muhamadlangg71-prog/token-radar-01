@@ -170,11 +170,11 @@ function clamp(value: number, low: number, high: number): number {
   return Math.min(high, Math.max(low, value));
 }
 
-// Round to four decimals for display. The implied value itself is always
+// Round to six decimals for display. The implied value itself is always
 // computed from the unrounded multipliers; only the breakdown a reader sees
 // is rounded.
-function round4(value: number): number {
-  return Math.round(value * 10000) / 10000;
+function round6(value: number): number {
+  return Math.round(value * 1000000) / 1000000;
 }
 
 function daysBetween(asOf: string, listedAt: string): number {
@@ -218,9 +218,9 @@ export function scoreProtocol(
       base_multiple: MODEL.base_multiple,
       category_multiple: category,
       growth_pct: growthPct,
-      growth_multiplier: round4(growth),
-      maturity_multiplier: round4(maturity),
-      chain_multiplier: round4(chain),
+      growth_multiplier: round6(growth),
+      maturity_multiplier: round6(maturity),
+      chain_multiplier: round6(chain),
       age_days: age,
     },
   };
@@ -296,6 +296,35 @@ const STEP_TWO: Record<string, StepFn> = {
     `Mint or deposit $${amount} of the stable asset through ${name} on ${chain}.`,
   Insurance: (name, chain, amount) =>
     `Buy $${amount} of cover from ${name} on ${chain} and keep the policy.`,
+  // Revision: every remaining category on the board gets its own opening
+  // move, so no row falls back to the generic deposit. BTC-anchored and
+  // BTC-native protocols take BTC, a basis desk opens a basis trade, a
+  // chain takes funds onto the chain itself, a card issuer is loaded and
+  // spent, a farm takes a farm deposit, a governance protocol takes a
+  // deposit plus a vote, a liquidity manager takes a managed-vault deposit,
+  // an OTC desk takes one trade, and a payments protocol opens a channel.
+  'Anchor BTC': (name, chain, amount) =>
+    `Deposit $${amount} of BTC into ${name} on ${chain} and keep the receipt.`,
+  'Basis Trading': (name, chain, amount) =>
+    `Deposit $${amount} of USDC as margin on ${name} and open one small basis trade.`,
+  CeDeFi: (name, chain, amount) =>
+    `Deposit $${amount} of USDC into ${name}'s vault on ${chain} and keep the position open.`,
+  Chain: (name, chain, amount) =>
+    `Move $${amount} of USDC onto ${chain} through ${name} and use it in the chain's main app.`,
+  'Crypto Card Issuer': (name, chain, amount) =>
+    `Order a ${name} card and load $${amount} on ${chain}, then use it for everyday spending.`,
+  'Decentralized BTC': (name, chain, amount) =>
+    `Deposit $${amount} of BTC into ${name} on ${chain} and keep the receipt.`,
+  Farm: (name, chain, amount) =>
+    `Deposit $${amount} of USDC into ${name}'s farm on ${chain} and keep the position open.`,
+  'Governance Incentives': (name, chain, amount) =>
+    `Deposit $${amount} into ${name} on ${chain} and take part in its governance votes.`,
+  'Liquidity Manager': (name, chain, amount) =>
+    `Deposit $${amount} into a ${name} managed vault on ${chain} and keep the shares.`,
+  'OTC Marketplace': (name, chain, amount) =>
+    `Fund $${amount} and place one OTC trade on ${name} on ${chain}.`,
+  Payments: (name, chain, amount) =>
+    `Open a $${amount} payment channel on ${chain} through ${name} and keep it funded.`,
 };
 
 const STEP_TWO_DEFAULT: StepFn = (name, chain, amount) =>
@@ -343,6 +372,31 @@ const STEP_THREE: Record<string, StepFn> = {
     `Mint or redeem a small amount of the stable asset through ${name} each week.`,
   Insurance: (name) =>
     `Check the cover terms on ${name} and renew or adjust a small amount each week.`,
+  // Revision: every remaining category on the board gets its own weekly
+  // habit, so no row falls back to the generic action. BTC protocols check
+  // yield and restake, a chain's app is used weekly, a bridge bridges, a
+  // card is spent and topped up, a farm harvests and restakes, a governance
+  // position votes, an OTC desk trades, and a payment channel routes.
+  'Anchor BTC': (name) =>
+    `Check the BTC yield accrual on ${name} and add or restake a small amount each week.`,
+  CeDeFi: (name) =>
+    `Check the yield on ${name} and add or withdraw a small amount each week.`,
+  Chain: (name, chain) =>
+    `Use ${name}'s main app on ${chain} once a week so the activity is recorded.`,
+  'Cross Chain Bridge': (name) =>
+    `Bridge a small amount through ${name} to another chain each week.`,
+  'Crypto Card Issuer': (name) =>
+    `Spend a small amount with the ${name} card each week and top it up.`,
+  'Decentralized BTC': (name) =>
+    `Check the BTC yield on ${name} and add or restake a small amount each week.`,
+  Farm: (name) =>
+    `Harvest and restake the farm rewards on ${name} once a week.`,
+  'Governance Incentives': (name) =>
+    `Vote with the ${name} position once a week and claim any incentives.`,
+  'OTC Marketplace': (name) =>
+    `Place one small OTC trade on ${name} each week.`,
+  Payments: (name) =>
+    `Route one small payment through the ${name} channel each week.`,
 };
 
 const STEP_THREE_DEFAULT: StepFn = (name) =>
@@ -394,6 +448,34 @@ const STEP_FIVE: Record<string, StepFn> = {
     `Before you withdraw, open ${name}'s rewards page and claim only from the link it publishes.`,
   RWA: (name) =>
     `Before you withdraw, open ${name}'s yield dashboard and claim only from the link it publishes.`,
+  // Revision: every remaining category on the board names the place its
+  // rewards are published, so no row falls back to the generic points page.
+  'Anchor BTC': (name) =>
+    `Before you withdraw, open ${name}'s BTC rewards page and claim only from the link it publishes.`,
+  CeDeFi: (name) =>
+    `Before you withdraw, open ${name}'s rewards page and claim only from the link it publishes.`,
+  Chain: (name) =>
+    `Before you withdraw, open ${name}'s rewards page and claim only from the link it publishes.`,
+  'Cross Chain Bridge': (name) =>
+    `Before you withdraw, open ${name}'s bridge rewards page and claim only from the link it publishes.`,
+  'Crypto Card Issuer': (name) =>
+    `Before you withdraw, open ${name}'s card rewards page and claim only from the link it publishes.`,
+  'Decentralized BTC': (name) =>
+    `Before you withdraw, open ${name}'s BTC rewards page and claim only from the link it publishes.`,
+  'Dual-Token Stablecoin': (name) =>
+    `Before you withdraw, open ${name}'s stable rewards page and claim only from the link it publishes.`,
+  Farm: (name) =>
+    `Before you withdraw, open ${name}'s farm rewards page and claim only from the link it publishes.`,
+  'Governance Incentives': (name) =>
+    `Before you withdraw, open ${name}'s incentives page and claim only from the link it publishes.`,
+  Insurance: (name) =>
+    `Before you withdraw, open ${name}'s rewards page and claim only from the link it publishes.`,
+  'OTC Marketplace': (name) =>
+    `Before you withdraw, open ${name}'s trading rewards page and claim only from the link it publishes.`,
+  Payments: (name) =>
+    `Before you withdraw, open ${name}'s rewards page and claim only from the link it publishes.`,
+  'Stablecoin Wrapper': (name) =>
+    `Before you withdraw, open ${name}'s stable rewards page and claim only from the link it publishes.`,
 };
 
 const STEP_FIVE_DEFAULT: StepFn = (_name) =>
@@ -609,6 +691,57 @@ export function boardIssue(board: BoardRow[], snapshot: Snapshot): string | null
 // The dashboard's data file: the snapshot's facts, the model's constants,
 // the board in its slim display form, and the live list, as one script the
 // page can load. The key order here is the file's order.
+//
+// The payload also carries a calibration table: for every category on the
+// board that already has launched tokens, the median market cap and the
+// median market-cap-per-dollar-of-TVL of those live tokens, next to the
+// model multiple the board credits the category. It is display-only —
+// nothing in it feeds back into the ranking — and it is computed from the
+// full live set in the snapshot, not from the top-24 the live tab shows.
+export interface CalibrationRow {
+  category: string;
+  live_n: number;
+  median_mcap_usd: number;
+  median_mcap_tvl: number;
+  model_multiple: number;
+}
+
+function median(values: number[]): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+export function buildCalibration(snapshot: Snapshot, board: BoardRow[]): CalibrationRow[] {
+  const boardCategories = new Set(board.map((row) => row.category));
+  const ratios = new Map<string, number[]>();
+  const mcaps = new Map<string, number[]>();
+  for (const p of snapshot.protocols) {
+    if (p.mcap_usd === null || p.category === 'CEX' || p.tvl_usd <= 0) continue;
+    if (!boardCategories.has(p.category)) continue;
+    const r = ratios.get(p.category) ?? [];
+    r.push(p.mcap_usd / p.tvl_usd);
+    ratios.set(p.category, r);
+    const m = mcaps.get(p.category) ?? [];
+    m.push(p.mcap_usd);
+    mcaps.set(p.category, m);
+  }
+  const rows: CalibrationRow[] = [];
+  for (const category of [...ratios.keys()].sort()) {
+    const ratioList = ratios.get(category) as number[];
+    const mcapList = mcaps.get(category) as number[];
+    rows.push({
+      category,
+      live_n: ratioList.length,
+      median_mcap_usd: Math.round(median(mcapList)),
+      median_mcap_tvl: round6(median(ratioList)),
+      model_multiple: categoryMultiple(category),
+    });
+  }
+  rows.sort((a, b) => b.live_n - a.live_n || (a.category < b.category ? -1 : 1));
+  return rows;
+}
+
 export function dataScript(snapshot: Snapshot, board: BoardRow[], radar: Radar): string {
   const watchlisted = new Set(snapshot.watchlist);
   const rows = board.map((row) => {
@@ -641,6 +774,7 @@ export function dataScript(snapshot: Snapshot, board: BoardRow[], radar: Radar):
     board_size: radar.board_size,
     early_size: radar.early_size,
     live_size: radar.live_size,
+    calibration: buildCalibration(snapshot, board),
     rows,
     live: radar.live,
   };
