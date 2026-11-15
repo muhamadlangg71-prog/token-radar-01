@@ -44,7 +44,7 @@ implied = round(TVL × category multiple × growth multiple
 - **Chain multiple** — `1 + 0.03 × min(chains − 1, 5)`.
 
 The base multiple of 0.25 is recorded in each row's breakdown but is not part
-of the product. Multipliers are rounded to four decimals only for display;
+of the product. Multipliers are rounded to six decimals only for display;
 the implied value is computed from the unrounded ones.
 
 ## Who gets ranked
@@ -64,15 +64,23 @@ Every row carries six steps: start from a fresh wallet, open a position
 sized by TVL ($150 past $1B, $100 past $100M, $50 below), repeat a small
 qualifying action each week, hold for 30 / 45 / 60 days depending on the
 protocol's age, then check the right rewards page before claiming anything,
-and keep a log. The opening move and the weekly habit are worded per
-category — vaults take a deposit, debt protocols mint against collateral,
-pools take liquidity, staking takes a stake.
+and keep a log. The opening move, the weekly habit and the claim step are
+worded per category — vaults take a deposit, debt protocols mint against
+collateral, pools take liquidity, staking takes a stake — and every one of
+the 33 categories on the board has its own wording, so no row falls back to
+a generic step.
 
 ## The dashboard
 
 `dashboard/index.html` with `app.js` and `app.css` renders the board with
 search, category and chain filters, a watchlist toggle, sorting, and a live
-tab. Clicking a row opens its detail view: why it ranks where it does, a
+tab. Above the board a summary strip shows the total implied value, the top
+10's share, the chains covered and the largest category; below it a bar chart
+of the top 10, a "How the model works" section with the full multiples table,
+and a calibration table that sets each category's model multiple against the
+median market cap per dollar of TVL of its already-launched tokens (display
+only — it never changes the ranking). Clicking a row opens its detail view: why it ranks where it does, a
 recompute of its implied value from the snapshot inputs, its farm plan, and
 its same-category peers. The page's state lives in the URL hash, so any
-filtered view is a link.
+filtered view is a link. The table scrolls inside its wrapper on narrow
+screens, so the page has no horizontal overflow at 390px.
